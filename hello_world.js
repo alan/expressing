@@ -7,26 +7,29 @@ var users = [{ name: "alan" }];
 app.configure(function(){
 	app.use(express.staticProvider(__dirname + '/public'));
 	app.use(express.bodyDecoder());
-    app.use(express.logger({format: ':method:uri'});
+    app.use(express.logger({format: ':method:uri'}));
 });
 
 app.configure('development', function(){
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true}));
 });
 
-app.all("/user/:id?", function(req, res, next){
-	var index = req.params.id - 1;
-	req.user = users[index];
-	next();
-});
+function loadUser(req, res, next){
+  var user = users[req.params.id -1];
+  if(user){
+    req.user = user;
+    next();
+  }else{
+    next(new Error('Failed to load user ' + req.params.id));
+  }
+}
 
 app.get('/', function(req, res){
 	res.send('hello world');
 });
 
-app.get("/user/:id?", function(req, res){
-	var msg = req.user ? "hello again " + req.user.name : "hello new user " + req.params.id;
-	res.send(msg);
+app.get("/user/:id?", loadUser, function(req, res){
+	res.send('Hello again ' + req.user.name);
 });
 
 app.post("/json_request", function(req, res){
