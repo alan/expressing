@@ -8,6 +8,8 @@ app.configure(function(){
 	app.use(express.staticProvider(__dirname + '/public'));
 	app.use(express.bodyDecoder());
     app.use(express.logger({format: ':method:uri'}));
+    app.set('view engine', 'ejs');
+  //  app.register(".html", require('ejs'));
 });
 
 app.configure('development', function(){
@@ -29,7 +31,9 @@ app.get('/', function(req, res){
 });
 
 app.get("/user/:id?", loadUser, function(req, res){
-	res.send('Hello again ' + req.user.name);
+    res.render('hello_user', {
+      locals: {user: req.user}
+    });
 });
 
 app.post("/json_request", function(req, res){
