@@ -30,6 +30,17 @@ app.get('/', function(req, res){
 	res.send('hello world');
 });
 
+app.get("/user/new", function(req, res){
+    res.render('user_new');
+});
+
+app.post("/user", function(req, res){
+    console.log(req.body);
+    index = users.push({name: req.body.user.name});
+    res.redirect("/user/" + index);
+});
+
+
 app.get("/user/:id?", loadUser, function(req, res){
     res.render('hello_user', {
       locals: {user: req.user}
