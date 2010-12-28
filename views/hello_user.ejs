@@ -1,1 +1,7 @@
 <p>Hello <%= user.name %></p>
+<script type="text/javascript">
+  var client = new Faye.Client('http://localhost:3000/faye');
+  client.subscribe('/messages', function(message) {
+    alert(message.text);
+  });
+</script>

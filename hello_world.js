@@ -7,6 +7,8 @@ var userProvider = new UserProvider();
 var websocketServer = new WebsocketServer();
 var app = express.createServer();
 
+var bayeux = websocketServer.fayeServer();
+
 app.configure(function(){
 	app.use(express.staticProvider(__dirname + '/public'));
 	app.use(express.bodyDecoder());
@@ -29,6 +31,13 @@ function loadUser(req, res, next){
       req.user = doc;
       next(); 
   });
+}
+
+function sendMessageToClients(req, res, next){
+  bayeux.getClient().publish('/messages', {
+    text: 'User: ' + req.user.name + " being viewed"
+  });
+  next();
 }
 
 app.get('/', function(req, res){
@@ -56,7 +65,7 @@ app.post("/user", function(req, res){
 });
 
 
-app.get("/users/:id?", loadUser, function(req, res){
+app.get("/users/:id?", loadUser, sendMessageToClients, function(req, res){
     res.render('hello_user', {
       locals: {user: req.user}
     });
@@ -66,7 +75,6 @@ app.post("/json_request", function(req, res){
 	res.send(req.body);
 });
 
-var websocket = websocketServer.fayeServer();
 
-websocket.attach(app);
+bayeux.attach(app);
 app.listen(3000);
