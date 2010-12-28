@@ -1,7 +1,10 @@
 var express = require('express');
 
 var UserProvider = require('./user_provider_memory').UserProvider;
+var WebsocketServer = require('./websocket_server').WebsocketServer;
 
+var userProvider = new UserProvider();
+var websocketServer = new WebsocketServer();
 var app = express.createServer();
 
 app.configure(function(){
@@ -15,7 +18,6 @@ app.configure('development', function(){
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true}));
 });
 
-var userProvider = new UserProvider();
 
 function loadUser(req, res, next){
   userProvider.findById(
@@ -64,4 +66,7 @@ app.post("/json_request", function(req, res){
 	res.send(req.body);
 });
 
+var websocket = websocketServer.fayeServer();
+
+websocket.attach(app);
 app.listen(3000);
