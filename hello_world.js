@@ -4,8 +4,6 @@ var UserProvider = require('./user_provider_memory').UserProvider;
 
 var app = express.createServer();
 
-var users = [{ name: "alan" }];
-
 app.configure(function(){
 	app.use(express.staticProvider(__dirname + '/public'));
 	app.use(express.bodyDecoder());
